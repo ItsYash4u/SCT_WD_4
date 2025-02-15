@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+            body {
+                margin: 0;
+                height: 100vh;
+                background: linear-gradient(-45deg, #ff0000, #ff7300, #002aff, #00ffd5);
+                background-size: 400% 400%;
+                animation: gradientAnimation 10s infinite ease-in-out;
+            }
+            @keyframes gradientAnimation {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+        :root {
+            --bg-color: #f5f5f5;
+            --text-color: #333;
+            --card-bg: #fff;
+            --border-color: #e0e0e0;
+            --primary-color: #3b82f6;
+            --hover-color: #2563eb;
+            --input-bg: #fff;
+        }
+
+        .dark-mode {
+            --bg-color: #1a1a1a;
+            --text-color: #fff;
+            --card-bg: #2d2d2d;
+            --border-color: #404040;
+            --input-bg: #3d3d3d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .add-todo {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+        }
+
+        textarea {
+            height: 80px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn-add {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            top: 0;
+        }
+
+        .btn-add:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .filters {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .category-filters, .status-filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filters button {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filters button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .filters button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .todo-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .todo-item {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .todo-content {
+            flex: 1;
+        }
+
+        .todo-title {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .todo-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .todo-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .priority-high { background-color: #fee2e2; color: #991b1b; }
+        .priority-medium { background-color: #fef3c7; color: #92400e; }
+        .priority-low { background-color: #d1fae5; color: #065f46; }
+        .category { background-color: #dbeafe; color: #1e40af; }
+        .date { background-color: #f3e8ff; color: #6b21a8; }
+
+        .todo-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .todo-actions button {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 6px;
+            cursor: pointer;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .todo-actions button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .completed .todo-title {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Todo App <span><h3>@ASK</h3></span></h1>
+            <button id="theme-toggle" class="theme-toggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </header>
+
+        <div class="add-todo">
+            <form id="todo-form">
+                <div class="form-group">
+                    <input type="text" id="title" placeholder="Task title" required>
+                    <textarea id="description" placeholder="Description"></textarea>
+                </div>
+                <div class="form-row">
+                    <input type="date" id="due-date">
+                    <select id="priority">
+                        <option value="low">Low Priority</option>
+                        <option value="medium">Medium Priority</option>
+                        <option value="high">High Priority</option>
+                    </select>
+                    <select id="category">
+                        <option value="personal">Personal</option>
+                        <option value="work">Work</option>
+                        <option value="errands">Errands</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-add">
+                    <i class="fas fa-plus"></i> Add Task
+                </button>
+            </form>
+        </div>
+
+        <div class="filters">
+            <div class="category-filters">
+                <button class="active" data-category="all">All</button>
+                <button data-category="personal">Personal</button>
+                <button data-category="work">Work</button>
+                <button data-category="errands">Errands</button>
+            </div>
+            <div class="status-filters">
+                <button class="active" data-status="all">All</button>
+                <button data-status="active">Active</button>
+                <button data-status="completed">Completed</button>
+            </div>
+        </div>
+
+        <div id="todo-list" class="todo-list">
+            <!-- Tasks will be added here dynamically -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State
+            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            let activeCategory = 'all';
+            let activeStatus = 'all';
+            let darkMode = localStorage.getItem('darkMode') === 'true';
+
+            // DOM Elements
+            const todoForm = document.getElementById('todo-form');
+            const todoList = document.getElementById('todo-list');
+            const themeToggle = document.getElementById('theme-toggle');
+            const categoryFilters = document.querySelector('.category-filters');
+            const statusFilters = document.querySelector('.status-filters');
+
+            // Initialize dark mode
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+
+            // Theme Toggle
+            themeToggle.addEventListener('click', () => {
+                darkMode = !darkMode;
+                document.body.classList.toggle('dark-mode');
+                themeToggle.innerHTML = darkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+                localStorage.setItem('darkMode', darkMode);
+            });
+
+            // Add Task
+            todoForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const task = {
+                    id: Date.now(),
+                    title: document.getElementById('title').value,
+                    description: document.getElementById('description').value,
+                    dueDate: document.getElementById('due-date').value,
+                    priority: document.getElementById('priority').value,
+                    category: document.getElementById('category').value,
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                };
+
+                tasks = [...tasks, task];
+                saveTasks();
+                renderTasks();
+                todoForm.reset();
+            });
+
+            // Filter Tasks
+            categoryFilters.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    activeCategory = e.target.dataset.category;
+                    updateFilterButtons();
+                    renderTasks();
+                }
+            });
+
+            statusFilters.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    activeStatus = e.target.dataset.status;
+                    updateFilterButtons();
+                    renderTasks();
+                }
+            });
+
+            function updateFilterButtons() {
+                categoryFilters.querySelectorAll('button').forEach(button => {
+                    button.classList.toggle('active', button.dataset.category === activeCategory);
+                });
+
+                statusFilters.querySelectorAll('button').forEach(button => {
+                    button.classList.toggle('active', button.dataset.status === activeStatus);
+                });
+            }
+
+            function saveTasks() {
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+            }
+
+            function formatDate(dateString) {
+                if (!dateString) return '';
+                return new Date(dateString).toLocaleDateString();
+            }
+
+            function renderTasks() {
+                const filteredTasks = tasks.filter(task => {
+                    const categoryMatch = activeCategory === 'all' || task.category === activeCategory;
+                    const statusMatch = activeStatus === 'all' || 
+                                    (activeStatus === 'completed' && task.completed) ||
+                                    (activeStatus === 'active' && !task.completed);
+                    return categoryMatch && statusMatch;
+                });
+
+                todoList.innerHTML = filteredTasks.map(task => `
+                    <div class="todo-item ${task.completed ? 'completed' : ''}" data-id="${task.id}">
+                        <div class="todo-content">
+                            <h3 class="todo-title">${task.title}</h3>
+                            ${task.description ? `<p class="todo-description">${task.description}</p>` : ''}
+                            <div class="todo-tags">
+                                <span class="tag priority-${task.priority}">
+                                    ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                                </span>
+                                <span class="tag category">
+                                    ${task.category.charAt(0).toUpperCase() + task.category.slice(1)}
+                                </span>
+                                ${task.dueDate ? `
+                                    <span class="tag date">
+                                        Due: ${formatDate(task.dueDate)}
+                                    </span>
+                                ` : ''}
+                            </div>
+                        </div>
+                        <div class="todo-actions">
+                            <button onclick="toggleComplete(${task.id})" title="Toggle Complete">
+                                <i class="fas ${task.completed ? 'fa-times' : 'fa-check'}"></i>
+                            </button>
+                            <button onclick="deleteTask(${task.id})" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Global functions for task actions
+            window.toggleComplete = (id) => {
+                tasks = tasks.map(task => 
+                    task.id === id ? { ...task, completed: !task.completed } : task
+                );
+                saveTasks();
+                renderTasks();
+            };
+
+            window.deleteTask = (id) => {
+                tasks = tasks.filter(task => task.id !== id);
+                saveTasks();
+                renderTasks();
+            };
+
+            // Initial render
+            renderTasks();
+            updateFilterButtons();
+        });
+    </script>
+</body>
+</html>
